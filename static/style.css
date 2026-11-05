@@ -1,0 +1,171 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f7fa;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+/* ===== 卡片主体 ===== */
+.central-box {
+    position: relative;
+    width: 720px;
+    height: 320px;
+    border-radius: 8px;
+    overflow: hidden;              /* 让圆角裁掉子元素的直角 */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* 左右两块各占一半，必须绝对定位才能各自平移 */
+.left-box,
+.right-box {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 延迟 0.2s：等按钮先淡出，卡片再交换 */
+    transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.2s;
+}
+
+.left-box {
+    left: 0;
+    background-color: #e60012;
+    z-index: 2;                    /* 红卡在上层，移动时盖过白卡 */
+}
+
+.right-box {
+    left: 50%;
+    background-color: #ffffff;
+    z-index: 1;
+}
+
+/* 交换位置：各平移自身宽度的 100% */
+.central-box.swapped .left-box {
+    transform: translateX(100%);
+}
+
+.central-box.swapped .right-box {
+    transform: translateX(-100%);
+}
+
+/* ===== 左侧红卡上的 Welcome ===== */
+.welcome {
+    color: #ffffff;
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    transition: opacity 0.4s ease 0.15s;
+}
+
+.central-box.swapped .welcome {
+    opacity: 0;
+}
+
+/* ===== 红色卡片移到右侧后出现的白色圆点 ===== */
+.dots {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    pointer-events: none;          /* 透明状态下也不拦截点击 */
+}
+
+.dots i {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    opacity: 0;
+}
+
+/* 三个点共用同一周期，靠各自的百分比错开出现、同时消失 */
+@keyframes dot1 {
+    0%   { opacity: 0; }
+    7%   { opacity: 1; }
+    90%  { opacity: 1; }
+    96%  { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+@keyframes dot2 {
+    0%   { opacity: 0; }
+    23%  { opacity: 1; }
+    90%  { opacity: 1; }
+    96%  { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+@keyframes dot3 {
+    0%   { opacity: 0; }
+    47%  { opacity: 1; }
+    90%  { opacity: 1; }
+    96%  { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+.central-box.swapped .dots i:nth-child(1) {
+    animation: dot1 1.5s ease-in-out 1s infinite;
+}
+
+.central-box.swapped .dots i:nth-child(2) {
+    animation: dot2 1.5s ease-in-out 1s infinite;
+}
+
+.central-box.swapped .dots i:nth-child(3) {
+    animation: dot3 1.5s ease-in-out 1s infinite;
+}
+
+/* ===== 白色卡片移到左侧后出现的 Waiting ===== */
+.waiting {
+    position: absolute;
+    color: #111111;
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    opacity: 0;
+    transition: opacity 0.5s ease 1s;   /* 交换结束后才淡入 */
+    pointer-events: none;               /* 关键：否则会盖住下方按钮吃掉点击 */
+}
+
+.central-box.swapped .waiting {
+    opacity: 1;
+}
+
+/* ===== 开始按钮：圆形，高度为卡片高度的 1/3 ===== */
+.start-button {
+    height: 33.3333%;              /* 320px / 3 ≈ 106px */
+    aspect-ratio: 1 / 1;           /* 宽高相等 => 正圆 */
+    border: none;
+    border-radius: 50%;
+    background-color: #e60012;
+    color: #ffffff;
+    font-size: 20px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.15s ease,
+                opacity 0.15s ease,
+                transform 0.2s ease;
+}
+
+.start-button:hover {
+    background-color: #ff2d3f;
+}
+
+/* 点击后：颜色迅速变浅并消失 */
+.central-box.swapped .start-button {
+    background-color: #ffe5e7;
+    opacity: 0;
+    transform: scale(0.85);
+    pointer-events: none;
+}
