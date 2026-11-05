@@ -1,17 +1,23 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from config import ALLOWED_IMAGE_EXT, HOST, IMAGE_DIR, PORT
+from config import ALLOWED_IMAGE_EXT, BASE_DIR, HOST, IMAGE_DIR, PORT
 import os
 import random
 
 app = FastAPI(title="随机图片服务", description="模拟拍照返回图片的HTTP服务")
-#挂在前端静态资源目录
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# 静态目录用绝对路径定位，避免不同运行环境工作目录不一致导致找不到
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+if os.path.isdir(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.get("/")
 async def root():
-    return FileResponse("static/index.html")
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    if not os.path.isfile(index_path):
+        return {"error": "前端页面缺失"}
+    return FileResponse(index_path)
 
 @app.get("/photos")
 async def get_random_photo():
